@@ -8,16 +8,20 @@ import com.teamtreehouse.model.League;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.HashMap;
 import java.util.Map;
 
 
 public class RosterGenerator {
   private Team team;
-  private League mLeague;
-  private Players[] listPlayers;
+  private Team pTeam;
+  private League mLeague = new League();
+  private Players players;
+  private Player[] playersArray;
   private BufferedReader mReader;
   private Map<String, String>mMenu;
   
@@ -56,7 +60,10 @@ public class RosterGenerator {
             System.out.printf("%s added! %n%n", team);
             break;
            case "add players":
-            mLeague.importPlayers();
+            String mTeam = promptTeam();
+            Player teamPlayer = promptPlayerForTeam(mTeam);
+            pTeam.addPlayers(teamPlayer);
+            System.out.printf("You chose: %s %n", teamPlayer);
             break;
            case "quit":
             System.out.println("Play Ball!");
@@ -86,6 +93,17 @@ public class RosterGenerator {
       int index = promptForIndex(league);
       return league.get(index);
     }
+  
+  private Player promptPlayerForTeam(String mTeam) throws IOException {
+    List<Player> playerList = Arrays.asList(mLeague.getPlayers());
+    List<String> playerNames = new ArrayList<>();
+    for (Player player : playerList) {
+      playerNames.add(player.getFirstName());
+    }
+    System.out.printf("Available songs for %s: %n", mTeam);
+    int index = promptForIndex(playerNames);
+    return playerList.get(index);
+  }
   
   private int promptForIndex(List<String> options) throws IOException {
     int counter = 1;

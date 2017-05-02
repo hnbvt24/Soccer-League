@@ -10,8 +10,8 @@ public class LeagueManager {
     Player[] players = Players.load();
     System.out.printf("There are currently %d registered players.%n", players.length);
     // Your code here!
-    Team team = new Team("Tigers", "Bud Foster");
-    System.out.printf("%s%n",team.toString());
+//    Team team = new Team("Tigers", "Bud Foster");
+//    System.out.printf("%s%n",team.toString());
     League league = new League();
     RosterGenerator roster = new RosterGenerator(league);
     roster.run();

@@ -1,5 +1,8 @@
 package com.teamtreehouse.model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +23,11 @@ public class Team {
   
   public String getCoach() {
     return mCoach; 
+  }
+  
+  public List<Player> addPlayers(Player player) {
+      mPlayers.add(player);
+      return mPlayers;
   }
   
   @Override
