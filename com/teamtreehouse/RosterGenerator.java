@@ -29,6 +29,7 @@ public class RosterGenerator {
   public RosterGenerator(League league) {
     //Initialization
     mLeague = league;
+    playersArray = mLeague.getPlayers();
     mReader = new BufferedReader(new InputStreamReader(System.in));
     mMenu = new HashMap<String, String>();
     mMenu.put("create team", "Create a new team to add to the Teams");
@@ -95,7 +96,7 @@ public class RosterGenerator {
     }
   
   private Player promptPlayerForTeam(String mTeam) throws IOException {
-    List<Player> playerList = Arrays.asList(mLeague.getPlayers());
+    List<Player> playerList = Arrays.asList(playersArray);
     List<String> playerNames = new ArrayList<>();
     for (Player player : playerList) {
       playerNames.add(player.getFirstName());
@@ -108,7 +109,7 @@ public class RosterGenerator {
   private int promptForIndex(List<String> options) throws IOException {
     int counter = 1;
     for (String option : options) {
-      System.out.printf("d.) % %s", counter, option);
+      System.out.printf("%d.) %s%n", counter, option);
       counter++;
     }
     String optionAsString = mReader.readLine();
