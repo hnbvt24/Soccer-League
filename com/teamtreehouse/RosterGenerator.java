@@ -36,7 +36,7 @@ public class RosterGenerator {
   private Player[] playersArray;
   private Queue<Player> mRoster;
   private Map<String, String>mMenu;
-//  private List<Player> playerList;
+  private List<Player> playerList;
   private TreeSet<Player> playerSet;
   
   //Constructor
@@ -44,7 +44,8 @@ public class RosterGenerator {
     //Initialization
     teams = new ArrayList<Team>();
     playersArray = players.load();
-    playerSet = new TreeSet<Player>(Arrays.asList(playersArray));
+    playerList = Arrays.asList(playersArray);
+    playerSet = new TreeSet<Player>(playerList);
     mReader = new BufferedReader(new InputStreamReader(System.in));
     mRoster = new ArrayDeque<Player>();
     mMenu = new HashMap<String, String>();
@@ -130,13 +131,14 @@ public class RosterGenerator {
   //returns available players in the league
   private Player promptAvailablePlayers(String teamChoice) throws IOException {
     List<String> roster = new ArrayList<>();
-    for (Player player : playerSet) {
+    List<Player> mPlayers = new ArrayList<>(playerSet);
+    for (Player player : mPlayers) {
       roster.add(player.getFirstName() + " " + player.getLastName() + " || Height:  " + player.getHeightInInches() + " in.  Experienced:  " + player.isPreviousExperience());
       
    }
     System.out.printf("Available players for the %s: %n", teamChoice);
     int index = promptForIndex(roster);
-    return playerSet.get(index);
+    return mPlayers.get(index);
   }
  
   //Lists out each item in list by number and takes user number input
