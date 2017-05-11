@@ -22,15 +22,6 @@ public class Team {
     return mTeamName; 
   }
   
-//  @Override
-//  public int compareTo(Team other) {
-//    if (equals(other)) {
-//      return 0;
-//    }
-//    int teamCmp = teamName.compareTo(other.teamName);
-//    return teamCmp;
-//  }
- 
   @Override
   public String toString() {
     return String.format("The %s, coached by %s", mTeamName, mCoach);
@@ -48,7 +39,7 @@ public class Team {
   }
   
   public Set<Player> getTeam() {
-    return team; 
+    return team;
   }
   
 }
