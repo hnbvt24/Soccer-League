@@ -33,6 +33,7 @@ public class RosterGenerator {
   private Players players;
   private Player[] playersArray;
   private Map<String, String>mMenu;
+  private Map<String, String>rMenu;
   private List<Player> playerList;
   private TreeSet<Player> playerSet;
   
@@ -45,16 +46,20 @@ public class RosterGenerator {
     playerList = Arrays.asList(playersArray);
     playerSet = new TreeSet<Player>(playerList);
     mReader = new BufferedReader(new InputStreamReader(System.in));
-//    mRoster = new ArrayDeque<Player>();
     mMenu = new HashMap<String, String>();
+    rMenu = new HashMap<String, String>();
     mMenu.put("new", "Create a new team to add to the Teams");
     mMenu.put("add", "Add players to a Team");
     mMenu.put("remove", "Remove a player from the Team");
+    mMenu.put("reports", "View reports of team rosters");
+    mMenu.put("print", "Print your team roster");
     mMenu.put("quit", "Exit this application");
+    rMenu.put("height", "Group players by height");
+    rMenu.put("experience", "Group players by experience");
   }
   
   private String promptAction() throws IOException {
-    System.out.printf("There are %d teams available in the League.%nYour options are: %n",
+    System.out.printf("There are %d teams in the League.%nYour options are: %n",
                      teams.size()
                      );
     for (Map.Entry<String, String> option : mMenu.entrySet()) {
@@ -63,6 +68,18 @@ public class RosterGenerator {
                         option.getValue());
     }
     System.out.print("What do you want to do:  ");
+    String choice = mReader.readLine();
+    return choice.trim().toLowerCase();
+  }
+  
+  private String promptReports() throws IOException {
+    System.out.println("Pick from the reports to see Team Stats.\nYour options are:\n");
+    for (Map.Entry<String, String> option : rMenu.entrySet()) {
+      System.out.printf("%s - %s %n",
+                        option.getKey(),
+                        option.getValue());
+    }
+    System.out.print("Which report would you like to see:  ");
     String choice = mReader.readLine();
     return choice.trim().toLowerCase();
   }
@@ -131,6 +148,47 @@ public class RosterGenerator {
                 }
               }
             }
+            break;
+           case "reports":
+            if(teams.size() == 0) {
+              System.out.printf("There are no teams to add players to. Please create a team first.%n%n");
+            } else {
+              String report = promptReports();
+              if (report.equals("height")) {
+                teamChoice = promptTeam();
+                for(Team team : teams) {
+                  if(team.getTeamName().equals(teamChoice)) {
+                    roster = team.getTeam();
+                  }
+                }
+              }
+              switch(report) {
+               case "height":
+                Set<String> result = groupByHeight(roster);
+                break;
+               case "experience":
+                result = groupByExperience();
+                break;
+               default:
+                System.out.printf("Unknown choice:  '%s'. Try again. %n%n%n",
+                                choice);
+              }
+            }
+            break;
+           case "print":
+            //print players on a team roster
+            if(teams.size() == 0) {
+              System.out.printf("There are no teams to add players to. Please create a team first.%n%n");
+            } else {
+              teamChoice = promptTeam();
+                for(Team team : teams) {
+                  if(team.getTeamName().equals(teamChoice)) {
+                    roster = team.getTeam();
+                    List<String> result = printRoster(teamChoice, roster);
+                    }
+                }
+            }
+            break;
            case "quit":
             System.out.println("Play Ball!");
             break;
@@ -156,7 +214,7 @@ public class RosterGenerator {
   
   //shows a list of teams to pick and returns that pick
   private String promptTeam() throws IOException {
-      System.out.println("Pick a team to add players to:");
+      System.out.println("Pick a team:");
       List<String> league = new ArrayList<>(getTeams());
       int index = promptForIndex(league);
       return league.get(index);
@@ -179,24 +237,48 @@ public class RosterGenerator {
   private Player promptRoster(String teamChoice, Set<Player> roster) throws IOException {
     List<String> mRoster = new ArrayList<>();
     List<Player> players = new ArrayList<>(roster);
-    for (Player player : roster) {
+    for (Player player : players) {
       mRoster.add(player.getLastName() + ", " + player.getFirstName() + " || Height:  " + player.getHeightInInches() + " in.  Experienced:  " + player.isPreviousExperience());
       
    }
-    System.out.printf("Available players for the %s: %n", teamChoice);
+    System.out.printf("Players for the %s: %n", teamChoice);
     int index = promptForIndex(mRoster);
     return players.get(index);
   }   
- 
-  //Lists out each item in list by number and takes user number input
-  private int promptForIndex(List<String> options) throws IOException {
+  
+  //prints roster of players on a team
+  private List<String> printRoster(String teamChoice, Set<Player> roster) {
     int counter = 1;
-    for (String option : options) {
-      System.out.printf("%d.) %s%n", counter, option);
+    List<String> mRoster = new ArrayList<>();
+    List<Player> players = new ArrayList<>(roster);
+    System.out.printf("%s Players: %n%n", teamChoice);
+    for (Player player : players) {
+      System.out.printf("%d.) %s, %s || Height: %d || Experienced: %s%n", 
+                        counter, 
+                        player.getLastName(),
+                        player.getFirstName(),
+                        player.getHeightInInches(),
+                        player.isPreviousExperience());
       counter++;
     }
-    String optionAsString = mReader.readLine();
-    int choice = Integer.parseInt(optionAsString.trim());
+    return mRoster;
+  }
+  
+  //Lists out each item in list by number and takes user number input
+  private int promptForIndex(List<String> options) throws IOException {
+    int choice = 0;
+    try {
+      int counter = 1;
+      for (String option : options) {
+        System.out.printf("%d.) %s%n", counter, option);
+        counter++;
+      }
+      String optionAsString = mReader.readLine();
+      choice = Integer.parseInt(optionAsString.trim());
+      
+    } catch (IllegalArgumentException iae) {
+        System.err.println("Invalid answer entered: " + iae.getMessage());
+    }
     return choice -1;
   }
   
@@ -213,25 +295,80 @@ public class RosterGenerator {
     return teamMap;
   }
   
-  private Map<String, Set<Player>> byPlayer() {
-    Map<String, Set<Player>> playerMap = new TreeMap<>();
-    for (Player player : playerSet) {
-      Set<Player> playerList = playerMap.get(player.getFirstName());
-      if (playerList == null) {
-        playerList = new TreeSet<>();
-        playerMap.put(player.getFirstName(), playerList);
-      }
-      playerList.add(player);
+  //prints teams by groups of height
+  private Map<String, Set<String>> byHeight(Set<Player> roster) {
+   Map<String, Set<String>> heightMap = new TreeMap<>();
+     Set<String> groupA = new TreeSet<>();
+     Set<String> groupB = new TreeSet<>();
+     Set<String> groupC = new TreeSet<>();
+     String params1 = "Height range between 35 and 40 in.";
+     String params2 = "Height range between 41 and 46 in.";
+     String params3 = "Height range between 47 and 50 in.";
+    
+     for (Player player : roster) {
+       if(player.getHeightInInches() >= 35 && player.getHeightInInches() <= 40) {
+         groupA.add(player.getLastName() + ", " + player.getFirstName() + " || Height:  " + player.getHeightInInches() + " in.  Experienced:  " + player.isPreviousExperience());
+       } else if (player.getHeightInInches() >= 41 && player.getHeightInInches() <= 46) {
+         groupB.add(player.getLastName() + ", " + player.getFirstName() + " || Height:  " + player.getHeightInInches() + " in.  Experienced:  " + player.isPreviousExperience());
+       } else if (player.getHeightInInches() >= 47 && player.getHeightInInches() <= 50) {
+         groupC.add(player.getLastName() + ", " + player.getFirstName() + " || Height:  " + player.getHeightInInches() + " in.  Experienced:  " + player.isPreviousExperience());
+       } else {
+         System.out.println("An error occurred printing the roster by height."); 
+       }
+     }
+    
+     heightMap.put(params1, groupA);
+     heightMap.put(params2, groupB);
+     heightMap.put(params3, groupC);
+
+    //prints each player within each group
+    for (Map.Entry<String, Set<String>> entry : heightMap.entrySet()) {
+      System.out.println("\n" + entry.getKey() + "\n");
+      List<String> group = new ArrayList<>(entry.getValue());
+         for (String player : group) {
+          
+          System.out.println(player);
+         }
     }
-    return playerMap;
+     
+    return heightMap;
+  }
+  
+  //prints each team and the number of experienced vs. non-experienced players
+  private Map<String, String> byExperience() {
+    Map<String, String> experienceMap = new TreeMap<>();
+    for(Team team : teams) {
+      String teamName = team.getTeamName();
+      int groupA = 0;
+      int groupB = 0;
+      String params1 = "Inexperienced Players:";
+      String params2 = "Experienced Players:";
+        Set<Player> nPlayers = team.getTeam();
+        for(Player player : nPlayers) {
+          boolean experience = player.isPreviousExperience();
+          if (!experience) {
+            groupA++;
+          } else {
+            groupB++;
+          }
+        }
+        System.out.println(teamName);
+        System.out.println("Experienced Players: " + Integer.toString(groupB));
+        System.out.println("Inxperienced Players: " + Integer.toString(groupA) + "\n");
+      }
+    return experienceMap;
   }
   
   public Set<String> getTeams() {
     return byTeam().keySet(); 
   }
   
-  public Set<String> getAvailablePlayers() {
-    return byPlayer().keySet(); 
+  public Set<String> groupByHeight(Set<Player> roster) {
+    return byHeight(roster).keySet();
+  }
+  
+  public Set<String> groupByExperience() {
+    return byExperience().keySet();
   }
 
 }
