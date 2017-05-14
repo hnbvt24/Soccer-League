@@ -7,6 +7,7 @@ public class Team {
   private Set<Player> team;
   private String mCoach;
   private String mTeamName;
+  public static final int MAX_PLAYERS = 11;
   
   public Team(String teamName, String coach) {
     mCoach = coach;
@@ -22,15 +23,6 @@ public class Team {
     return mTeamName; 
   }
   
-//  @Override
-//  public int compareTo(Team other) {
-//    if (equals(other)) {
-//      return 0;
-//    }
-//    int teamCmp = teamName.compareTo(other.teamName);
-//    return teamCmp;
-//  }
- 
   @Override
   public String toString() {
     return String.format("The %s, coached by %s", mTeamName, mCoach);
@@ -43,12 +35,16 @@ public class Team {
     team.remove(player); 
   }
   
+  public int getMaxPlayers() {
+    return MAX_PLAYERS; 
+  }
+  
   public int getTeamCount() {
     return team.size(); 
   }
   
   public Set<Player> getTeam() {
-    return team; 
+    return team;
   }
   
 }
