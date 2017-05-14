@@ -111,6 +111,10 @@ public class RosterGenerator {
                   System.out.printf("The %s have %d players on the team.%n%n", 
                               teamChoice,
                               roster.size());
+                  if(roster.size() == team.getMaxPlayers()) {
+                    System.out.println("You have reached the maximum amount of players you can add to a team.");
+                    break;
+                  } else {
                   player = promptAvailablePlayers(teamChoice);
                   team.addPlayer(player);
                   System.out.printf("You added player %s %s to the %s.%n" +
@@ -120,6 +124,7 @@ public class RosterGenerator {
                                 teamChoice,
                                 teamChoice,
                                 roster.size());
+                  }
                 }
               }
             }
@@ -136,15 +141,20 @@ public class RosterGenerator {
                   System.out.printf("The %s have %d players on the team.%n%n", 
                               teamChoice,
                               roster.size());
-                  player = promptRoster(teamChoice, roster);
-                  team.removePlayer(player);
-                  System.out.printf("You removed player %s %s from the %s.%n" +
-                                "%s Roster: %d players%n%n",
-                                player.getFirstName(),
-                                player.getLastName(),
-                                teamChoice,
-                                teamChoice,
-                                roster.size());
+                  if(roster.size() == 0) {
+                    System.out.println("You have no players on this team to remove.");
+                    break;
+                  } else {
+                    player = promptRoster(teamChoice, roster);
+                    team.removePlayer(player);
+                    System.out.printf("You removed player %s %s from the %s.%n" +
+                                  "%s Roster: %d players%n%n",
+                                  player.getFirstName(),
+                                  player.getLastName(),
+                                  teamChoice,
+                                  teamChoice,
+                                  roster.size());
+                    }
                 }
               }
             }
@@ -205,10 +215,14 @@ public class RosterGenerator {
   
   //returns a new team with team name and coach
   private Team promptNewTeam() throws IOException {
+    do {
       System.out.print("Enter the team's name:  ");
       teamName = mReader.readLine();
+    } while(teamName.isEmpty());
+    do {
       System.out.print("Enter the coach's name:  ");
       coachName = mReader.readLine();
+    } while(coachName.isEmpty());
       return new Team(teamName, coachName);
     }
   

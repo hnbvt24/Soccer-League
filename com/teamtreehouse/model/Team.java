@@ -7,6 +7,7 @@ public class Team {
   private Set<Player> team;
   private String mCoach;
   private String mTeamName;
+  public static final int MAX_PLAYERS = 11;
   
   public Team(String teamName, String coach) {
     mCoach = coach;
@@ -32,6 +33,10 @@ public class Team {
   }
   public void removePlayer(Player player) {
     team.remove(player); 
+  }
+  
+  public int getMaxPlayers() {
+    return MAX_PLAYERS; 
   }
   
   public int getTeamCount() {
